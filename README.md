@@ -1,56 +1,5 @@
 # QuickRide
 
-> **Note:** This is a simulative project developed for a hackathon by novice developers. It is not a fully functional production-ready application and serves primarily as a proof of concept.
-
-A web-based ridesharing application designed to match passengers traveling along similar routes, reducing costs and environmental impact through automatic ride matching.
-
-## Overview
-
-QuickRide connects users who share common travel routes and vehicle preferences, enabling cost-effective carpooling. The application calculates accurate distances between locations using the Haversine formula, determines pricing, and automatically searches for matching rides in the database.
-
-When multiple passengers are matched for the same route and vehicle type, all participants receive a 30% discount on their fare, promoting both economic and environmental benefits.
-
-## Technology Stack
-
-**Backend:**
-- Node.js with Express.js - RESTful API server
-- MongoDB with Mongoose ODM - Database persistence
-- In-memory fallback storage
-- dotenv - Environment configuration management
-
-**Frontend:**
-- HTML, CSS, JavaScript
-- Tailwind CSS
-
-**External APIs:**
-- OpenStreetMap Nominatim API - Geocoding service for address-to-coordinate conversion
-- Browser Geolocation API - Real-time location tracking for safety features
-
-## Setup
-Installation
-
-### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (optional - application includes in-memory fallback)
-
-### Setup Instructions
-
-1. Clone the repository and install dependencies:
-```bash
-npm install
-```
-
-2. (Optional) Start MongoDB service:
-```bash
-# Linux/Mac
-sudo systemctl start mongod
-
-# Windows
-net start MongoDB
-```
-
-# QuickRide
-
 > **Note:** This repository contains a simulative project developed for a hackathon by novice developers. It is not a fully functional production-ready application and is provided as a proof of concept only.
 
 ## Overview
@@ -199,7 +148,7 @@ The second tab should detect the first booking as a matching ride and apply the 
 
 - Add user authentication and role separation (driver/passenger)
 - Real-time updates via WebSockets
-- Location input autocomplete and normalization
+- Location input autocomplete.
 - Persistent ride history and analytics
 - Payment gateway integration
 
