@@ -168,10 +168,10 @@ Tab 2:
 
 ## Contributors
 
-- Sooraj - Founder & Tech Lead
-- Mareo - Co-Founder & Product Manager
+- Sooraj
+- Mareo 
 
-Built for D-Solve Dotslash Hackathon, College of Engineering Trivandrum, 2025
+Built for D-Solve Dotslash Hackathon, College of Engineering Trivandrum.
 
 ## License
 
