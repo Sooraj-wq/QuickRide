@@ -49,89 +49,135 @@ sudo systemctl start mongod
 net start MongoDB
 ```
 
-3. Configure environment variables by creating a `.env` file:
+# QuickRide
+
+> **Note:** This repository contains a simulative project developed for a hackathon by novice developers. It is not a fully functional production-ready application and is provided as a proof of concept only.
+
+## Overview
+
+QuickRide is a web-based ridesharing prototype that attempts to match passengers traveling on similar routes with the same vehicle type. The application computes distance between locations, estimates fare, stores booking data, and looks for matching rides in order to offer a rideshare discount.
+
+When multiple passengers are matched for the same route and vehicle type, participants receive a 30% discount on the fare.
+
+## Technology Stack
+
+**Backend**
+- Node.js with Express.js — REST API server
+- MongoDB with Mongoose — persistent storage (in-memory fallback available for development)
+- dotenv — environment configuration
+
+**Frontend**
+- HTML5, CSS3, JavaScript (ES6 modules)
+- Tailwind CSS (CDN)
+- LocalStorage for short-term client-side persistence
+
+**External Services**
+- OpenStreetMap Nominatim API — geocoding (address → coordinates)
+- Browser Geolocation API — emergency location sharing
+
+## Installation
+### Prerequisites
+ - Node.js (v14+)
+ - npm
+ - MongoDB (optional; required for persistent storage)
+
+### Steps
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. (Optional) Start MongoDB service:
+
+```bash
+# Linux/macOS
+sudo systemctl start mongod
+
+# Or run mongod directly with a dbpath
+mongod --dbpath ~/data/db
+
+# Windows (PowerShell)
+net start MongoDB
+```
+
+3. Create a `.env` file in the project root (optional):
+
 ```env
 PORT=4000
 MONGODB_URL=mongodb://127.0.0.1:27017/rideshare
 ```
 
 4. Start the application:
+
 ```bash
 npm start
-```Usage
+```
+
+Open the app at `http://localhost:4000`.
+
+> If MongoDB is not running the server will automatically use an in-memory store; data will not persist between restarts.
+
+## Usage
 
 ### Booking a Ride
 
-1. Enter a unique user ID
-2. Specify pickup and destination locations
-3. Select vehicle type (SUV, Auto, or Sedan)
-4. Choose payment method (Cash, UPI, Google Pay, or Apple Pay)
-5. Submit the booking request
+1. Open the home page and enter a unique user ID.
+2. Enter pickup and destination locations.
+3. Select vehicle type and payment method.
+4. Click **Order taxi now**.
 
-### Ride Matching Process
+The frontend will geocode the addresses, compute distance (Haversine), calculate fare (₹15/km), and submit the ride to the backend.
 
-The application performs the following operations:
-- Converts location strings to GPS coordinates via OpenStreetMap API
-- Calculates precise distance using the Haversine formula
-- Computes fare at ₹15 per kilometer
-- Stores Functionality
-- Accurate distance calculation using the Haversine formula
-- Intelligent ride matching based on route and vehicle preferences
-- Dynamic pricing with automatic rideshare discounts (30% reduction)
-- Administrative dashboard to view all active rides
-- Ride management and deletion capabilities
+### Ride Matching
 
-### Safety Features
-- Emergency contact registration system
-- One-click emergency alert functionality:
-  - Real-time GPS location retrieval
-- Ride status tracking and completion confirmation. It'll keep searching for matches. If it finds someone, you get the discount automatically. If not, you can either keep waiting or just book an individual ride.
+- The backend stores the submitted ride and the ride details page periodically queries `/allrides` to find matches.
+- A match requires identical pickup, destination, and vehicle type, and a different user ID.
+- When matches are found the displayed fare is reduced by 30% and the number of matched passengers is shown.
 
-## Features
+### Safety & Ride Management
 
-### Core stuff
-- Real distance calculation using the Haversine formula
-- Automatic ride matching based on route and car type
-- Dynamic pricing with rideshare discounts
-- View all active rides
-- Delete rides when they're done
+- Users may save an emergency contact in the ride details page.
+- Emergency alert simulates notifying the saved contact and shares the current location via a WhatsApp link.
+- Active rides can be viewed on the **All Rides** page and deleted if required.
 
-### Safety features
-Because this stuff matters:
-- Save an emergency contact
-- Emergency alert button that:
-  - Grabs your GPS location
-  - Sends it via WhatsApp to your emergency contact
-  - Includes a Google Maps link
-- Ride completion tracking
+## API Endpoints
+
+- `GET /` — Serve homepage
+- `POST /findride` — Create or find an existing ride
+- `GET /allrides` — Retrieve all active rides
+- `DELETE /deleteride/:uid` — Delete ride by user ID
 
 ## Project Structure
 
 ```
-├── app.js                 # Main server file
-├── index.html            # Home page with booking form
-├── package.json          # Dependencies
+├── app.js                 # Server entrypoint
+├── index.html             # Booking UI
+├── package.json
 ├── public/
-│   ├── aboutus.html      # Team info
-│   ├── all-rides.html    # View all active rides
-│   ├── ride-details.html # Ride confirmation & matching
-│   ├── home.js          # Main booking logic
-│   └── haversine.js     # Distance calculation
-```Limitations
-
-- Location matching requires consistent naming conventions (e.g., "New York" and "NYC" are not recognized as equivalent)
-- OpenStreetMap Nominatim API has rate limiting restrictions for high-frequency requests
-- In-memory storage mode does not persist data across server restarts
-- No authentication system implemented - user IDs are not validated or protected
-- Geolocation features require HTTPS in production environments for browser security compliance
-GET  /allrides           - Fetch all rides
-DELETE /deleteride/:uid  - Remove a ride
+│   ├── home.js            # Client booking logic
+│   ├── haversine.js      # Distance calculation
+│   ├── ride-details.html  # Ride details and matching UI
+│   ├── all-rides.html     # View all active rides
+│   └── aboutus.html
 ```
-To test the ride matching functionality:
 
-1. Open the application in two separate browser tabs
+## Known Limitations
 
-**Tab 1:**
+- Matching requires consistent textual location input; there is no fuzzy normalization ("New York" vs "NYC" may not match).
+- The app uses the public Nominatim API which enforces rate limits.
+- In-memory fallback does not persist data after restart.
+- No authentication: user IDs are not validated; access controls are not implemented.
+- Emergency/location features require HTTPS in production for full browser support.
+
+## Testing the Matching Flow
+
+To test locally, open two browser tabs and create two bookings with different user IDs but identical pickup, destination and vehicle type.
+
+**Example input**
+
+Tab 1:
 ```
 User ID: alice
 From: Times Square, New York
@@ -139,7 +185,7 @@ To: Central Park, New York
 Vehicle: Sedan
 ```
 
-**Tab 2:**
+Tab 2:
 ```
 User ID: bob
 From: Times Square, New York
@@ -147,29 +193,20 @@ To: Central Park, New York
 Vehicle: Sedan
 ```
 
-The second user (Bob) should receive a notification of a matching ride with the first user (Alice), and both should be eligible for the 30%
-- From: "Times Square, New York"
-- To: "Central Park, New York"
-- Car: Sedan
+The second tab should detect the first booking as a matching ride and apply the rideshare discount.
 
-Tab 2:
-- User ID: "bob"
-- From: "Times Square, New York"
-- To: "CenEnhancements
+## Future Improvements
 
-- User authentication and authorization system
-- Driver/passenger role differentiation
-- Real-time updates using WebSocket technology
-- Location autocomplete with predictive search
-- Ride history and analytics dashboard
-- User rating and review system
+- Add user authentication and role separation (driver/passenger)
+- Real-time updates via WebSockets
+- Location input autocomplete and normalization
+- Persistent ride history and analytics
 - Payment gateway integration
-- Mobile application development
 
 ## Contributors
 
 - Sooraj
-- Mareo 
+- Mareo
 
 Built for D-Solve Dotslash Hackathon, College of Engineering Trivandrum.
 
